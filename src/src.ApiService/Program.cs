@@ -1,3 +1,6 @@
+using src.ApiService.Endpoints;
+using src.ApiService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire components.
@@ -5,35 +8,57 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// Add MongoDB
+builder.AddMongoDBClient(connectionName: "mongodb");
+builder.Services.AddSingleton<ProductService>();
+
+// Add Swagger/OpenAPI
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+
+    app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+    });
+}
+
 app.UseExceptionHandler();
+app.UseCors();
 
-var summaries = new[]
+// Redirect root to Swagger in development
+if (app.Environment.IsDevelopment())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    app.MapGet("/", () => Results.Redirect("/swagger"));
+}
 
-app.MapGet("/weatherforecast", () =>
+// Seed MongoDB with initial data
+using (var scope = app.Services.CreateScope())
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-});
+    var productService = scope.ServiceProvider.GetRequiredService<ProductService>();
+    var seedProducts = ProductSeedService.GetSeedProducts();
+    await productService.SeedProductsAsync(seedProducts);
+}
 
+// Map endpoints
+app.MapProductEndpoints();
+app.MapWeatherForecastEndpoints();
 app.MapDefaultEndpoints();
 
-app.Run();
+// app.MapSwagger();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+app.Run();

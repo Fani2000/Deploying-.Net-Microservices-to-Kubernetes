@@ -12,12 +12,19 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-// builder.Services.AddHttpClient<WeatherApiClient>(client =>
-//     {
-//         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-//         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-//         client.BaseAddress = new("https+http://apiservice");
-//     });
+// Add HttpClient for ProductApiClient
+// Use environment variable if set (Docker Compose), otherwise use Aspire service discovery
+var apiServiceUrl = builder.Configuration["Services:apiservice"] ?? "https+http://apiservice";
+builder.Services.AddHttpClient<ProductApiClient>(client =>
+{
+    client.BaseAddress = new Uri(apiServiceUrl);
+});
+
+// Add HttpClient for WeatherApiClient
+builder.Services.AddHttpClient<WeatherApiClient>(client =>
+{
+    client.BaseAddress = new Uri(apiServiceUrl);
+});
 
 var app = builder.Build();
 

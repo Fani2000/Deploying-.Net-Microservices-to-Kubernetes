@@ -1,29 +1,19 @@
+using src.Web.Models;
+
 namespace src.Web;
 
-public class WeatherApiClient(HttpClient httpClient)
+public class WeatherApiClient
 {
-    public async Task<WeatherForecast[]> GetWeatherAsync(int maxItems = 10, CancellationToken cancellationToken = default)
+    private readonly HttpClient _httpClient;
+
+    public WeatherApiClient(HttpClient httpClient)
     {
-        List<WeatherForecast>? forecasts = null;
-
-        await foreach (var forecast in httpClient.GetFromJsonAsAsyncEnumerable<WeatherForecast>("/weatherforecast", cancellationToken))
-        {
-            if (forecasts?.Count >= maxItems)
-            {
-                break;
-            }
-            if (forecast is not null)
-            {
-                forecasts ??= [];
-                forecasts.Add(forecast);
-            }
-        }
-
-        return forecasts?.ToArray() ?? [];
+        _httpClient = httpClient;
     }
-}
 
-public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public async Task<WeatherForecast[]> GetWeatherForecastAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.GetFromJsonAsync<WeatherForecast[]>("/weatherforecast", cancellationToken);
+        return response ?? Array.Empty<WeatherForecast>();
+    }
 }

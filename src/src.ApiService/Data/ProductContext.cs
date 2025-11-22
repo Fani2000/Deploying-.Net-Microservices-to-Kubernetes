@@ -1,6 +1,6 @@
-using src.Web.Models;
+using src.ApiService.Models;
 
-namespace src.Web.Data;
+namespace src.ApiService.Data;
 
 public static class ProductContext
 {
@@ -8,6 +8,7 @@ public static class ProductContext
         {
             new Product()
                 {
+                    Id = "1",
                     Name = "IPhone X",
                     Description = "This phone is the company's biggest change to its flagship smartphone in years. It includes a borderless.",
                     ImageFile = "product-1.png",
@@ -16,6 +17,7 @@ public static class ProductContext
                 },
                 new Product()
                 {
+                    Id = "2",
                     Name = "Samsung 10",
                     Description = "This phone is the company's biggest change to its flagship smartphone in years. It includes a borderless.",
                     ImageFile = "product-2.png",
@@ -24,6 +26,7 @@ public static class ProductContext
                 },
                 new Product()
                 {
+                    Id = "3",
                     Name = "Huawei Plus",
                     Description = "This phone is the company's biggest change to its flagship smartphone in years. It includes a borderless.",
                     ImageFile = "product-3.png",
@@ -32,6 +35,7 @@ public static class ProductContext
                 },
                 new Product()
                 {
+                    Id = "4",
                     Name = "Xiaomi Mi 9",
                     Description = "This phone is the company's biggest change to its flagship smartphone in years. It includes a borderless.",
                     ImageFile = "product-4.png",
@@ -40,6 +44,7 @@ public static class ProductContext
                 },
                 new Product()
                 {
+                    Id = "5",
                     Name = "HTC U11+ Plus",
                     Description = "This phone is the company's biggest change to its flagship smartphone in years. It includes a borderless.",
                     ImageFile = "product-5.png",
@@ -48,6 +53,7 @@ public static class ProductContext
                 },
                 new Product()
                 {
+                    Id = "6",
                     Name = "LG G7 ThinQ EndofCourse",
                     Description = "This phone is the company's biggest change to its flagship smartphone in years. It includes a borderless.",
                     ImageFile = "product-6.png",
@@ -56,3 +62,4 @@ public static class ProductContext
                 }
         };
 }
+

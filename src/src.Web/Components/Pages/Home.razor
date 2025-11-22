@@ -1,29 +1,47 @@
 ﻿@page "/"
 @using src.Web.Models
-@using src.Web.Data
+@using src.Web
+@inject ProductApiClient ProductApiClient
 
 <h1>Products - Updated V3 from AKS Deployment - last run</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Description</th>
-            <th>Image File</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in ProductContext.Products)
-        {
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>@item.Name</td>
-                <td>@item.Category</td>
-                <td>@item.Description</td>
-                <td>@item.ImageFile</td>
-                <td>@item.Price?.ToString("C")</td>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Image File</th>
+                <th>Price</th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in products)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Category</td>
+                    <td>@item.Description</td>
+                    <td>@item.ImageFile</td>
+                    <td>@item.Price?.ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Product>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductApiClient.GetProductsAsync();
+    }
+}
